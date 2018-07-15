@@ -30,9 +30,10 @@
 #ifndef PRUNED_LANDMARK_LABELING_H_
 #define PRUNED_LANDMARK_LABELING_H_
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <malloc.h>
 #include <stdint.h>
-#include <xmmintrin.h>
 #include <sys/time.h>
 #include <climits>
 #include <iostream>
@@ -45,11 +46,11 @@
 #include <algorithm>
 #include <fstream>
 #include <utility>
+#include <xmmintrin.h>
 
 //
 // NOTE: Currently only unweighted and undirected graphs are supported.
 //
-
 template<int kNumBitParallelRoots = 50>
 class PrunedLandmarkLabeling {
  public:
@@ -86,10 +87,10 @@ class PrunedLandmarkLabeling {
   static const uint8_t INF8;  // For unreachable pairs
 
   struct index_t {
-    uint8_t bpspt_d[kNumBitParallelRoots];
+    uint8_t bpspt_d[kNumBitParallelRoots]; // ??
     uint64_t bpspt_s[kNumBitParallelRoots][2];  // [0]: S^{-1}, [1]: S^{0}
-    uint32_t *spt_v;
-    uint8_t *spt_d;
+    uint32_t *spt_v; // vertex ID
+    uint8_t *spt_d; // distance
   } __attribute__((aligned(64)));  // Aligned for cache lines
 
   int num_v_;
@@ -176,7 +177,7 @@ bool PrunedLandmarkLabeling<kNumBitParallelRoots>
 
     // Relabel the vertex IDs
     std::vector<int> rank(V);
-    for (int i = 0; i < V; ++i) rank[deg[i].second] = i;
+    for (int i = 0; i < V; ++i) rank[deg[i].second] = i; // rank[old_label] = new_label
     std::vector<std::vector<int> > new_adj(V);
     for (int v = 0; v < V; ++v) {
       for (size_t i = 0; i < adj[v].size(); ++i) {
@@ -184,7 +185,7 @@ bool PrunedLandmarkLabeling<kNumBitParallelRoots>
       }
     }
     adj.swap(new_adj);
-  }
+  } // Get the adj as the new_adj now.
 
   //
   // Bit-parallel labeling
@@ -194,8 +195,8 @@ bool PrunedLandmarkLabeling<kNumBitParallelRoots>
     std::vector<uint8_t> tmp_d(V);
     std::vector<std::pair<uint64_t, uint64_t> > tmp_s(V);
     std::vector<int> que(V);
-    std::vector<std::pair<int, int> > sibling_es(E);
-    std::vector<std::pair<int, int> > child_es(E);
+    std::vector<std::pair<int, int> > sibling_es(E); // E_0
+    std::vector<std::pair<int, int> > child_es(E); // E_1
 
     int r = 0;
     for (int i_bpspt = 0; i_bpspt < kNumBitParallelRoots; ++i_bpspt) {
@@ -227,7 +228,7 @@ bool PrunedLandmarkLabeling<kNumBitParallelRoots>
           vs.push_back(v);
           if (++ns == 64) break;
         }
-      }
+      } // line 4
 
       for (int d = 0; que_t0 < que_h; ++d) {
         int num_sibling_es = 0, num_child_es = 0;
@@ -239,11 +240,12 @@ bool PrunedLandmarkLabeling<kNumBitParallelRoots>
             int tv = adj[v][i];
             int td = d + 1;
 
-            if (d > tmp_d[tv]);
-            else if (d == tmp_d[tv]) {
-              if (v < tv) {
+            if (d > tmp_d[tv]) {
+            	;
+            } else if (d == tmp_d[tv]) {
+              if (v < tv) { // ?? Why need v < tv ?
                 sibling_es[num_sibling_es].first  = v;
-                sibling_es[num_sibling_es].second = tv;
+                sibling_es[num_sibling_es].second = tv; // line 19: E_0 union (v, tv)
                 ++num_sibling_es;
               }
             } else {
