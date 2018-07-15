@@ -254,7 +254,7 @@ bool PrunedLandmarkLabeling<kNumBitParallelRoots>
                 tmp_d[tv] = td;
               }
               child_es[num_child_es].first  = v;
-              child_es[num_child_es].second = tv;
+              child_es[num_child_es].second = tv; // line 14: E_1 union (v, tv)
               ++num_child_es;
             }
           }
