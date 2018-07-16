@@ -48,6 +48,8 @@
 #include <utility>
 #include <xmmintrin.h>
 
+#include "profiler.h"
+
 //
 // NOTE: Currently only unweighted and undirected graphs are supported.
 //
@@ -131,6 +133,7 @@ bool PrunedLandmarkLabeling<kNumBitParallelRoots>
 template<int kNumBitParallelRoots>
 bool PrunedLandmarkLabeling<kNumBitParallelRoots>
 ::ConstructIndex(const std::vector<std::pair<int, int> > &es) {
+	Profiler profiler;
   //
   // Prepare the adjacency list and index space
   //
@@ -159,6 +162,7 @@ bool PrunedLandmarkLabeling<kNumBitParallelRoots>
     index_[v].spt_v = NULL;
     index_[v].spt_d = NULL;
   }
+  profiler.print("Input finished.\n");
 
   //
   // Order vertices by decreasing order of degree
@@ -186,7 +190,8 @@ bool PrunedLandmarkLabeling<kNumBitParallelRoots>
     }
     adj.swap(new_adj);
   } // Get the adj as the new_adj now.
-
+  profiler.print("Order finished.\n");
+  profiler.reset();
   //
   // Bit-parallel labeling
   //
@@ -210,7 +215,9 @@ bool PrunedLandmarkLabeling<kNumBitParallelRoots>
       fill(tmp_d.begin(), tmp_d.end(), INF8);
       fill(tmp_s.begin(), tmp_s.end(), std::make_pair(0, 0));
 
-      int que_t0 = 0, que_t1 = 0, que_h = 0;
+      int que_t0 = 0;
+      int que_t1 = 0; // last que.size
+      int que_h = 0; // que.size
       que[que_h++] = r;
       tmp_d[r] = 0;
       que_t1 = que_h;
@@ -248,7 +255,7 @@ bool PrunedLandmarkLabeling<kNumBitParallelRoots>
                 sibling_es[num_sibling_es].second = tv; // line 19: E_0 union (v, tv)
                 ++num_sibling_es;
               }
-            } else {
+            } else { // d < tmp_d[tv]
               if (tmp_d[tv] == INF8) {
                 que[que_h++] = tv;
                 tmp_d[tv] = td;
@@ -262,13 +269,13 @@ bool PrunedLandmarkLabeling<kNumBitParallelRoots>
 
         for (int i = 0; i < num_sibling_es; ++i) {
           int v = sibling_es[i].first, w = sibling_es[i].second;
-          tmp_s[v].second |= tmp_s[w].first;
-          tmp_s[w].second |= tmp_s[v].first;
+          tmp_s[v].second |= tmp_s[w].first; // ?? Why need this?
+          tmp_s[w].second |= tmp_s[v].first; // Line 21: S^{0}[w] |= S^{-1}[v]
         }
         for (int i = 0; i < num_child_es; ++i) {
           int v = child_es[i].first, c = child_es[i].second;
-          tmp_s[c].first  |= tmp_s[v].first;
-          tmp_s[c].second |= tmp_s[v].second;
+          tmp_s[c].first  |= tmp_s[v].first; // Line 23: S^{-1}[c] |= S^{-1}[v]
+          tmp_s[c].second |= tmp_s[v].second; // Line 24: S^{0}[c] |= S^{0}[v]
         }
 
         que_t0 = que_t1;
