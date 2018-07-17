@@ -145,6 +145,9 @@ bool PrunedLandmarkLabeling<kNumBitParallelRoots>
   for (size_t i = 0; i < es.size(); ++i) {
     V = std::max(V, std::max(es[i].first, es[i].second) + 1);
   }
+
+  profiler.print("Vertices: ", V, " Edges: ", E, "\n");
+
   std::vector<std::vector<int> > adj(V);
   for (size_t i = 0; i < es.size(); ++i) {
     int v = es[i].first, w = es[i].second;
@@ -210,7 +213,7 @@ bool PrunedLandmarkLabeling<kNumBitParallelRoots>
         for (int v = 0; v < V; ++v) index_[v].bpspt_d[i_bpspt] = INF8;
         continue;
       }
-      usd[r] = true;
+      usd[r] = true; profiler.bfs_click();
 
       fill(tmp_d.begin(), tmp_d.end(), INF8);
       fill(tmp_s.begin(), tmp_s.end(), std::make_pair(0, 0));
@@ -228,7 +231,7 @@ bool PrunedLandmarkLabeling<kNumBitParallelRoots>
       for (size_t i = 0; i < adj[r].size(); ++i) {
         int v = adj[r][i];
         if (!usd[v]) {
-          usd[v] = true;
+          usd[v] = true; profiler.bfs_click();
           que[que_h++] = v;
           tmp_d[v] = 1;
           tmp_s[v].first = 1ULL << ns;
@@ -278,6 +281,9 @@ bool PrunedLandmarkLabeling<kNumBitParallelRoots>
           tmp_s[c].second |= tmp_s[v].second; // Line 24: S^{0}[c] |= S^{0}[v]
         }
 
+        profiler.add_label(num_sibling_es + num_child_es);
+        profiler.print("Label: ", profiler.get_label_count(), " Time: ", profiler.time_click(), "\n");
+
         que_t0 = que_t1;
         que_t1 = que_h;
       }
@@ -287,8 +293,12 @@ bool PrunedLandmarkLabeling<kNumBitParallelRoots>
         index_[inv[v]].bpspt_s[i_bpspt][0] = tmp_s[v].first;
         index_[inv[v]].bpspt_s[i_bpspt][1] = tmp_s[v].second & ~tmp_s[v].first;
       }
+
+//      printf("The %u BFS finished.\n", profiler.bfs_click());
+      profiler.print("The ", profiler.get_bfs_count(), "  BFS finished.\n");
     }
   }
+  profiler.print("Bit parallel finished.\n");
 
   //
   // Pruned labeling
@@ -361,6 +371,10 @@ bool PrunedLandmarkLabeling<kNumBitParallelRoots>
               vis[w] = true;
             }
           }
+
+          profiler.add_label(1);
+          profiler.print("Label: ", profiler.get_label_count(), " Time: ", profiler.time_click(), "\n");
+
        pruned:
           {}
         }
@@ -374,6 +388,7 @@ bool PrunedLandmarkLabeling<kNumBitParallelRoots>
         dst_r[tmp_idx_r.first[i]] = INF8;
       }
       usd[r] = true;
+      printf("The %u BFS finished.\n", profiler.bfs_click());
     }
 
     for (int v = 0; v < V; ++v) {
@@ -390,6 +405,7 @@ bool PrunedLandmarkLabeling<kNumBitParallelRoots>
       tmp_idx[v].second.clear();
     }
   }
+  profiler.print("PLL finished.\n");
 
   time_indexing_ += GetCurrentTimeSec();
   return true;

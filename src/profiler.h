@@ -5,6 +5,7 @@
 
 #pragma once
 #include <sys/time.h>
+#include <iostream>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -13,8 +14,9 @@ class Profiler {
 private:
 	double start_time;
 	unsigned bfs_count;
+	unsigned long label_count;
 
-	const double get_wtime() const
+	double get_wtime() const
 	{
 		timeval t;
 		gettimeofday(&t, NULL);
@@ -30,9 +32,10 @@ public:
 	{
 		start_time = get_wtime();
 		bfs_count = 0;
+		label_count = 0;
 	}
 
-	const double time_click() const
+	double time_click() const
 	{
 		return get_wtime() - start_time;
 	}
@@ -43,8 +46,31 @@ public:
 		return bfs_count;
 	}
 
-	void print(const char *s) const
+	unsigned get_bfs_count()
 	{
-		printf("%s", s);
+		return bfs_count;
+	}
+
+	void add_label(unsigned long l)
+	{
+		label_count += l;
+	}
+
+	unsigned long get_label_count()
+	{
+		return label_count;
+	}
+
+	template <typename T>
+	void print(const T& arg)
+	{
+		std::cout << arg;
+	}
+
+	template <typename First_t, typename... Types>
+	void print(const First_t& first, const Types&... args)
+	{
+		std::cout << first;
+		Profiler::print(args...);
 	}
 };
