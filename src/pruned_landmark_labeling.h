@@ -53,7 +53,7 @@
 //
 // NOTE: Currently only unweighted and undirected graphs are supported.
 //
-template<int kNumBitParallelRoots = 50>
+template<int kNumBitParallelRoots = 500>
 class PrunedLandmarkLabeling {
  public:
   // Constructs an index from a graph, given as a list of edges.
@@ -288,6 +288,7 @@ bool PrunedLandmarkLabeling<kNumBitParallelRoots>
         que_t0 = que_t1;
         que_t1 = que_h;
 
+//        profiler.print("d: ", d, " que_t0: ", que_t0, " que_h: ", que_h, "\n");
         if (profiler.equal_values(d, int(INF8))) {
         	profiler.print("d: ", d, " que_t0: ", que_t0, " que_h: ", que_h, "\n");
         	if (que_t0 >= que_h) {
@@ -392,6 +393,7 @@ bool PrunedLandmarkLabeling<kNumBitParallelRoots>
         que_t0 = que_t1;
         que_t1 = que_h;
 
+//        profiler.print("d: ", d, " que_t0: ", que_t0, " que_h: ", que_h, "\n");
         if (profiler.equal_values(d, int(INF8))) {
         	profiler.print("d: ", d, " que_t0: ", que_t0, " que_h: ", que_h, "\n");
         	if (que_t0 >= que_h) {
