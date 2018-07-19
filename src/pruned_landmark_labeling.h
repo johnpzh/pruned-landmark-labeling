@@ -287,6 +287,14 @@ bool PrunedLandmarkLabeling<kNumBitParallelRoots>
 //        }
         que_t0 = que_t1;
         que_t1 = que_h;
+
+        if (profiler.equal_values(d, int(INF8))) {
+        	profiler.print("d: ", d, " que_t0: ", que_t0, " que_h: ", que_h, "\n");
+        	if (que_t0 >= que_h) {
+        		exit(2);
+        	}
+        }
+
       }
 
       for (int v = 0; v < V; ++v) {
@@ -383,6 +391,13 @@ bool PrunedLandmarkLabeling<kNumBitParallelRoots>
 
         que_t0 = que_t1;
         que_t1 = que_h;
+
+        if (profiler.equal_values(d, int(INF8))) {
+        	profiler.print("d: ", d, " que_t0: ", que_t0, " que_h: ", que_h, "\n");
+        	if (que_t0 >= que_h) {
+        		exit(2);
+        	}
+        }
       }
 
       for (int i = 0; i < que_h; ++i) vis[que[i]] = false;

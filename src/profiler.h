@@ -73,4 +73,13 @@ public:
 		std::cout << first;
 		Profiler::print(args...);
 	}
+
+	template <typename T>
+	bool equal_values(const T& a, const T& b)
+	{
+		if (a == b)
+			return true;
+		else
+			return false;
+	}
 };
