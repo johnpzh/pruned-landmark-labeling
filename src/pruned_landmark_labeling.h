@@ -213,7 +213,8 @@ bool PrunedLandmarkLabeling<kNumBitParallelRoots>
         for (int v = 0; v < V; ++v) index_[v].bpspt_d[i_bpspt] = INF8;
         continue;
       }
-      usd[r] = true; profiler.bfs_click();
+      usd[r] = true;
+      profiler.bfs_click();
 
       fill(tmp_d.begin(), tmp_d.end(), INF8);
       fill(tmp_s.begin(), tmp_s.end(), std::make_pair(0, 0));
@@ -231,7 +232,8 @@ bool PrunedLandmarkLabeling<kNumBitParallelRoots>
       for (size_t i = 0; i < adj[r].size(); ++i) {
         int v = adj[r][i];
         if (!usd[v]) {
-          usd[v] = true; profiler.bfs_click();// ?? why usd[v] = true?
+          usd[v] = true; // ?? why usd[v] = true?
+          profiler.bfs_click();
           que[que_h++] = v;
           tmp_d[v] = 1;
           tmp_s[v].first = 1ULL << ns; // ?? why 1ULL << ns
