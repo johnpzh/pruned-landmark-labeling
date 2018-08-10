@@ -62,7 +62,7 @@ using NetworKit::node;
 //
 // NOTE: Currently only unweighted and undirected graphs are supported.
 //
-template<uint64_t kNumBitParallelRoots = 50>
+template<uint64_t kNumBitParallelRoots = 500>
 class PrunedLandmarkLabeling {
  public:
   // Constructs an index from a graph, given as a list of edges.
@@ -513,44 +513,26 @@ bool PrunedLandmarkLabeling<kNumBitParallelRoots>
   // Order vertices by decreasing order of degree
   //
   time_indexing_ = -GetCurrentTimeSec();
-  std::vector<uint64_t> inv(V);  // inv[new label] = old label
+  std::vector<uint64_t> inv(V);  // new label -> old label
   {
     // Order
-	// Instantiate Approximate Betweenness
-	ApproxBetweenness aab(G);
-	// Run Approximate Betweenness
-	aab.run();
-	// Get Ranking
-	const std::vector<std::pair<node, double> > &ranking = aab.ranking();
-    for (uint64_t i = 0; i < V; ++i) inv[i] = ranking[i].first;
+    std::vector<std::pair<float, uint64_t> > deg(V);
+    for (uint64_t v = 0; v < V; ++v) {
+      // We add a random value here to diffuse nearby vertices
+      deg[v] = std::make_pair(adj[v].size() + float(rand()) / RAND_MAX, v);
+    }
+    std::sort(deg.rbegin(), deg.rend());
+    for (uint64_t i = 0; i < V; ++i) inv[i] = deg[i].second;
+
     // Relabel the vertex IDs
     std::vector<uint64_t> rank(V);
-    for (uint64_t i = 0; i < V; ++i) rank[ranking[i].first] = i; // rank[old_label] = new_label
+    for (uint64_t i = 0; i < V; ++i) rank[deg[i].second] = i; // rank[old_label] = new_label
     std::vector<std::vector<uint64_t> > new_adj(V);
     for (uint64_t v = 0; v < V; ++v) {
       for (size_t i = 0; i < adj[v].size(); ++i) {
         new_adj[rank[v]].push_back(rank[adj[v][i]]);
       }
     }
-	//////////////// Old Degee Order
-    //// Order
-    //std::vector<std::pair<float, uint64_t> > deg(V);
-    //for (uint64_t v = 0; v < V; ++v) {
-    //  // We add a random value here to diffuse nearby vertices
-    //  deg[v] = std::make_pair(adj[v].size() + float(rand()) / RAND_MAX, v);
-    //}
-    //std::sort(deg.rbegin(), deg.rend());
-    //for (uint64_t i = 0; i < V; ++i) inv[i] = deg[i].second;
-    //// Relabel the vertex IDs
-    //std::vector<uint64_t> rank(V);
-    //for (uint64_t i = 0; i < V; ++i) rank[deg[i].second] = i; // rank[old_label] = new_label
-    //std::vector<std::vector<uint64_t> > new_adj(V);
-    //for (uint64_t v = 0; v < V; ++v) {
-    //  for (size_t i = 0; i < adj[v].size(); ++i) {
-    //    new_adj[rank[v]].push_back(rank[adj[v][i]]);
-    //  }
-    //}
-	/////////////// End Old Degree Order
     adj.swap(new_adj);
   } // Get the adj as the new_adj now.
 //  profiler.print("Order finished.\n");

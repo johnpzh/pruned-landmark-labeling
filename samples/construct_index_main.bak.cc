@@ -10,26 +10,11 @@ int main(int argc, char **argv) {
     exit(EXIT_FAILURE);
   }
 
-  PrunedLandmarkLabeling<50> pll;
-  // By Johnpzh
-  char *filename = argv[1];
-  EdgeListReader reader(
-		  '\t',
-		  0,
-		  "#",
-		  true,
-		  false);
-  Graph G = reader.read(string(filename));
-  if (!pll.ConstructIndex(G)) {
+  PrunedLandmarkLabeling<> pll;
+  if (!pll.ConstructIndex(argv[1])) {
     cerr << "error: Load or construction failed" << endl;
     exit(EXIT_FAILURE);
   }
-
-  //if (!pll.ConstructIndex(argv[1])) {
-  //  cerr << "error: Load or construction failed" << endl;
-  //  exit(EXIT_FAILURE);
-  //}
-  // End By Johnpzh
   pll.PrintStatistics();
 
   if (!pll.StoreIndex(argv[2])) {

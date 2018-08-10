@@ -1,9 +1,6 @@
 CXX = g++
 CXXFLAGS = -g -Wall -Wextra -O3 -std=c++1y
 
-# By Johnpzh
-LIB = -I/scratch/zpeng.scratch/pppp/networkit-git/include -L/scratch/zpeng.scratch/pppp/networkit-git -lNetworKit -fopenmp
-# End By Johnpzh
 
 all: bin bin/construct_index bin/query_distance bin/benchmark
 
@@ -11,16 +8,16 @@ bin:
 	mkdir -p bin
 
 bin/construct_index: samples/construct_index_main.cc src/pruned_landmark_labeling.h
-	$(CXX) $(CXXFLAGS) -Isrc -o $@ $^ $(LIB)
+	$(CXX) $(CXXFLAGS) -Isrc -o $@ $^
 
 bin/query_distance: samples/query_distance_main.cc src/pruned_landmark_labeling.h
-	$(CXX) $(CXXFLAGS) -Isrc -o $@ $^ $(LIB)
+	$(CXX) $(CXXFLAGS) -Isrc -o $@ $^
 
 bin/benchmark: samples/benchmark_main.cc src/pruned_landmark_labeling.h
-	$(CXX) $(CXXFLAGS) -Isrc -o $@ $^ $(LIB)
+	$(CXX) $(CXXFLAGS) -Isrc -o $@ $^
 
 bin/pruned_landmark_labeling_test: src/pruned_landmark_labeling_test.cc src/pruned_landmark_labeling.h
-	$(CXX) $(CXXFLAGS) -lgtest -lgtest_main -o $@ $^ $(LIB)
+	$(CXX) $(CXXFLAGS) -lgtest -lgtest_main -o $@ $^
 
 
 
