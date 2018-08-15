@@ -2,7 +2,7 @@ CXX = g++
 CXXFLAGS = -g -Wall -Wextra -O3 -std=c++1y
 
 # By Johnpzh
-LIB = -I/scratch/zpeng.scratch/pppp/networkit-git/include -L/scratch/zpeng.scratch/pppp/networkit-git -lNetworKit -fopenmp
+LIB = -I./include -L./lib -lNetworKit -fopenmp
 # End By Johnpzh
 
 all: bin bin/construct_index bin/query_distance bin/benchmark
