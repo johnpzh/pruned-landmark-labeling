@@ -45,7 +45,7 @@ int main(int argc, char **argv) {
 	bool is_directed = false;
 	uint64_t start_id = 1;
 	int opt;
-	if (argc < 4) {
+	if (argc < 3) {
 		//fprintf(stderr, "Usage: ./construct_index <input_data> <output_index> [-s | -t] [-k 50|500|1000|2000] [-d] [-i StartID]\n");
 		fprintf(stderr, "Usage: ./construct_index <input_data> <output_index> [-s | -t] [-d] [-i StartID]\n");
 		exit(EXIT_FAILURE);
